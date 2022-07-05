@@ -7,16 +7,32 @@ import ride from "./sounds/ride.wav";
 import snare from "./sounds/snare.wav";
 import tink from "./sounds/tink.wav";
 import tom from "./sounds/tom.wav";
+ 
+let app_mode = "";
+let record = false;
 
-// const boom_element = document.getElementById("boom");
-// const clap_element = document.getElementById("clap");
-// const hi_hat_element = document.getElementById("hi_hat");
-// const kick_element = document.getElementById("kick");
-// const open_hat_element = document.getElementById("open_hat");
-// const ride_element = document.getElementById("ride");
-// const snare_element = document.getElementById("snare");
-// const tink_element = document.getElementById("tink");
-// const tom_element = document.getElementById("tom");
+const start_game_btn = document.getElementById("start_game");
+const record_game_btn = document.getElementById("record");
+
+start_game_btn.addEventListener("click", () => {
+  if (app_mode === "game") {
+    start_game_btn.textContent = "Start Game";
+    app_mode = "";
+  } else {
+    start_game_btn.textContent = "End Game";
+    app_mode = "game";
+  }
+});
+
+record_game_btn.addEventListener("click", () => {
+  record = !record;
+  if(record === false){
+    record_game_btn.textContent="Record";
+  }else {
+    record_game_btn.textContent="Recording";
+  }
+  // console.log(record)
+});
 
 const key_config = [
   { id: "boom", key: "a", sound: boom },
@@ -30,23 +46,58 @@ const key_config = [
   { id: "tom", key: "l", sound: tom },
 ];
 
-// map returns a MODIFIED COPY of the array without affecting original array
-// forEach only returns the ORIGINAL array
 
-// normal function(){} is reusable
-// arrow funtions(()=>{}) is one-time
+// let timestamp = new Date().getTime();
+const time = {timestamp: "", key:""}; //object
+const game_record = []; //array
 
-// <div id="boom" class="card control">
-//     <div class="label container">Boom</div>
-//     <div class="key container">A</div>
-// </div>
+const beats = ["f", "d", "f", "d", "f", "f", "d", "f", "d"];
+const padding_count = 3;
+const empty_array = Array(padding_count).fill("");
+
+//  <div class="card sequence-card">A</div>
+const targets = document.getElementById("targets");
+let new_array = [...empty_array, ...beats, ...empty_array];
+
+// Game Mode
+let current_index = 0;
+let score = 0;
+
+const getActualPosition = () => current_index + padding_count;
+
+const score_element = document.getElementById("score");
+const updateTargets = () => {
+  targets.innerHTML = "";
+  const computed_array = new_array.slice(
+    current_index,
+    getActualPosition() + 4
+  );
+  // console.log(computed_array);
+  computed_array.forEach((item, index) => {
+    const target_div = document.createElement("div");
+    target_div.setAttribute(
+      "class",
+      `card sequence-card ${index === 3 ? "active" : ""}`
+    );
+    target_div.textContent = item;
+    targets.appendChild(target_div);
+  });
+  score_element.textContent = score;
+};
+updateTargets();
+
+/**
+ * <div id="boom" class="card control">
+     <div class="label container">A</div>
+     <div class="key container">Boom</div>
+   </div>
+ */
 
 const parent = document.getElementById("controls");
 key_config.forEach((k) => {
-  // { id: "boom", key: "a", sound: boom },
+  //     { id: "boom", key: "a", sound: boom },
   const control_div = document.createElement("div");
   control_div.setAttribute("id", k.id);
-  control_div.setAttribute("key", k.key);
   control_div.setAttribute("class", "card control");
 
   const control_label = document.createElement("div");
@@ -65,56 +116,29 @@ key_config.forEach((k) => {
     const audio = new Audio(k.sound);
     audio.play();
   });
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === k.key) {
+    if (e.key.toLocaleLowerCase() === k.key) {
       const audio = new Audio(k.sound);
       audio.play();
     }
+
+    // If user key matches current target key then we increment
+    if (app_mode === "game" && new_array[getActualPosition()] === e.key) {
+      current_index++;
+      score++;
+
+      time.timestamp = Date.now();
+      time.key = e.key;
+      if (record === true) {
+        game_record.push({...time});
+        console.log(game_record);
+      }
+    }
+
+    if (getActualPosition() >= new_array.length - padding_count - 1) {
+    }
+
+    updateTargets();
   });
 });
-
-// long-way of adding audio
-// boom_element.addEventListener("click", (e) => {
-//     const audio = new Audio(boom);
-//     audio.play();
-// });
-
-// clap_element.addEventListener("click", (e) => {
-//     const audio = new Audio(clap);
-//     audio.play();
-// });
-
-// hi_hat_element.addEventListener("click", (e) => {
-//     const audio = new Audio(hi_hat);
-//     audio.play();
-// });
-
-// kick_element.addEventListener("click", (e) => {
-//     const audio = new Audio(kick);
-//     audio.play();
-// });
-
-// open_hat_element.addEventListener("click", (e) => {
-//     const audio = new Audio(open_hat);
-//     audio.play();
-// });
-
-// ride_element.addEventListener("click", (e) => {
-//     const audio = new Audio(ride);
-//     audio.play();
-// });
-
-// snare_element.addEventListener("click", (e) => {
-//     const audio = new Audio(snare);
-//     audio.play();
-// });
-
-// tink_element.addEventListener("click", (e) => {
-//     const audio = new Audio(tink);
-//     audio.play();
-// });
-
-// tom_element.addEventListener("click", (e) => {
-//     const audio = new Audio(tom);
-//     audio.play();
-// });
