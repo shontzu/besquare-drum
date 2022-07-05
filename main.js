@@ -31,7 +31,7 @@ record_game_btn.addEventListener("click", () => {
   }else {
     record_game_btn.textContent="Recording";
   }
-  // console.log(record)
+  console.log(record)
 });
 
 const key_config = [
@@ -142,3 +142,14 @@ key_config.forEach((k) => {
     updateTargets();
   });
 });
+
+/*
+
+if app_mode is start, then record
+minus the datetime now with a value(??) and have start time and duration variable 
+key recording variable to hold functionality of recording
+set within click and keydown function
+playback use setInterval(), go through recording array, check the keys in 100ms, if exceed time, will play sound move to next index
+in settings feature, should be able to update key feature
+
+*/
