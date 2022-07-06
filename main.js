@@ -7,7 +7,7 @@ import ride from "./sounds/ride.wav";
 import snare from "./sounds/snare.wav";
 import tink from "./sounds/tink.wav";
 import tom from "./sounds/tom.wav";
- 
+
 let app_mode = "";
 let record = false;
 
@@ -26,12 +26,13 @@ start_game_btn.addEventListener("click", () => {
 
 record_game_btn.addEventListener("click", () => {
   record = !record;
-  if(record === false){
-    record_game_btn.textContent="Record";
-  }else {
-    record_game_btn.textContent="Recording";
+  if (record === false) {
+    record_game_btn.textContent = "Record";
+  } else {
+    record_game_btn.textContent = "Recording";
+    time.start_time = Date.now();
   }
-  console.log(record)
+  console.log(record);
 });
 
 const key_config = [
@@ -46,9 +47,7 @@ const key_config = [
   { id: "tom", key: "l", sound: tom },
 ];
 
-
-// let timestamp = new Date().getTime();
-const time = {timestamp: "", key:""}; //object
+const time = { start_time: "", end_time:"", duration:"", key: "" }; //object
 const game_record = []; //array
 
 const beats = ["f", "d", "f", "d", "f", "f", "d", "f", "d"];
@@ -127,11 +126,12 @@ key_config.forEach((k) => {
     if (app_mode === "game" && new_array[getActualPosition()] === e.key) {
       current_index++;
       score++;
-
-      time.timestamp = Date.now();
+      
+      time.end_time = Date.now();
+      time.duration = time.end_time - time.start_time;
       time.key = e.key;
       if (record === true) {
-        game_record.push({...time});
+        game_record.push({ ...time });
         console.log(game_record);
       }
     }
