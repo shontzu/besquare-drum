@@ -8,20 +8,28 @@ import snare from "./sounds/snare.wav";
 import tink from "./sounds/tink.wav";
 import tom from "./sounds/tom.wav";
 
-let app_mode = "";
+//TODO: one variable to manage game state (switch case)
+let app_mode = false; //numeration
 let record = false;
+let playback = false;
+let setting = false;
 
 const start_game_btn = document.getElementById("start_game");
 const record_game_btn = document.getElementById("record");
+const playback_game_btn = document.getElementById("playback");
+const setting_game_btn = document.getElementById("setting");
+const box = document.getElementById("setting-page");
+let intervalID;
+// const myInterval = setInterval(myTimer, 1000);
 
 start_game_btn.addEventListener("click", () => {
-  if (app_mode === "game") {
+  app_mode = !app_mode;
+  if (app_mode === false) {
     start_game_btn.textContent = "Start Game";
-    app_mode = "";
   } else {
     start_game_btn.textContent = "End Game";
-    app_mode = "game";
   }
+  console.log("app_mode: " + app_mode);
 });
 
 record_game_btn.addEventListener("click", () => {
@@ -32,7 +40,46 @@ record_game_btn.addEventListener("click", () => {
     record_game_btn.textContent = "Recording";
     time.start_time = Date.now();
   }
-  console.log(record);
+  console.log("record: " + record);
+});
+
+playback_game_btn.addEventListener("click", (e) => {
+  playback = !playback;
+  if (playback === false) {
+    playback_game_btn.textContent = "Playback";
+    clearInterval(intervalID);
+  } else {
+    playback_game_btn.textContent = "Stop";
+    let i = 0;
+    intervalID = setInterval(function () {
+      console.log(game_record[i].sound);
+      const audio = new Audio(game_record[i].sound);
+      audio.play();
+      i++;
+      if (i > game_record.length) {
+        clearInterval(intervalID);
+        console.log("end");
+      }
+    }, game_record[i].duration);
+  }
+
+  //TODO: settimeout
+  console.log("playback: " + playback);
+  game_record.forEach((e) => {
+    console.log(e);
+  });
+});
+
+setting_game_btn.addEventListener("click", (e) => {
+  setting = !setting;
+  if (setting === false) {
+    setting_game_btn.textContent = "Settings";
+    box.style.display = "none";
+  } else {
+    setting_game_btn.textContent = "Home";
+    box.style.display = "block";
+  }
+  console.log("settings: " + setting);
 });
 
 const key_config = [
@@ -47,7 +94,7 @@ const key_config = [
   { id: "tom", key: "l", sound: tom },
 ];
 
-const time = { start_time: "", end_time:"", duration:"", key: "" }; //object
+const time = { start_time: "", end_time: "", duration: "", key: "", sound: "" }; //object
 const game_record = []; //array
 
 const beats = ["f", "d", "f", "d", "f", "f", "d", "f", "d"];
@@ -120,16 +167,19 @@ key_config.forEach((k) => {
     if (e.key.toLocaleLowerCase() === k.key) {
       const audio = new Audio(k.sound);
       audio.play();
+    } else {
+      return;
     }
 
     // If user key matches current target key then we increment
-    if (app_mode === "game" && new_array[getActualPosition()] === e.key) {
+    if (app_mode === true && new_array[getActualPosition()] === e.key) {
       current_index++;
       score++;
-      
+
       time.end_time = Date.now();
       time.duration = time.end_time - time.start_time;
       time.key = e.key;
+      time.sound = k.sound;
       if (record === true) {
         game_record.push({ ...time });
         console.log(game_record);
